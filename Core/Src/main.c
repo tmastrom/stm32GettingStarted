@@ -80,6 +80,11 @@ int main(void)
 	uint16_t raw;
 	char msg[10];
 
+	// Capacitive sensor @ 3.3V
+	// in water = 1205
+	// out = 2509
+
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
