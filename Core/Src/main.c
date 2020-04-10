@@ -78,7 +78,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	uint16_t raw;
-	char msg[10];
+	//char msg[10];
 
 	// Capacitive sensor @ 3.3V
 	// in water = 1205
@@ -109,7 +109,7 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_ADC_Start(&hadc1);
 
   /* USER CODE END 2 */
 
@@ -118,27 +118,24 @@ int main(void)
   while (1)
   {
 	// Toggle green led (PD12)
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-
-	// Set GPIO Pin A10
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-
-	// Get ADC value
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	raw = HAL_ADC_GetValue(&hadc1);
-
-	// Test: Set GPIO pin low
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-
-	//printf("ADC\n");
-
-	// Convert to string and print
-	//sprintf(msg, "%hu\r\n", raw);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
+	//HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
 	// Pretend we have to do something else for a while
-	HAL_Delay(1000);
+	//HAL_Delay(500);
+
+
+	int pin = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+	// If button is pressed
+	if ( pin == 1)
+	{
+		// Turn on LED 6
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+	}
+	else
+	{
+		// Turn off LED 6
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -286,13 +283,19 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_15, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PD12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PD12 PD15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
